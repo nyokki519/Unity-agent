@@ -11,6 +11,10 @@
     [
       "2026-10-07-6b2a054c4dd6",
       "{\"id\": \"2026-10-07-6b2a054c4dd6\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": null, \"previous\": null, \"gscStatus\": \"authentication_required\"}"
+    ],
+    [
+      "2026-10-07-de7ef081ca4b",
+      "{\"id\": \"2026-10-07-de7ef081ca4b\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": null, \"previous\": null, \"gscStatus\": \"authentication_required\"}"
     ]
   ]
 }
