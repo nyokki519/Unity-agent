@@ -1,0 +1,76 @@
+name: SEO Growth weekly
+on:
+  schedule:
+    - cron: '45 23 * * 0' # Monday 08:45 JST
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['seo_growth/**', 'tests/**', 'config.json', 'requirements.txt', '.github/workflows/seo-weekly.yml']
+permissions:
+  contents: write
+concurrency:
+  group: seo-growth-weekly
+  cancel-in-progress: false
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    env:
+      SEO_HP_TOKEN: ${{ secrets.SEO_HP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - name: Configure existing GSC credentials only if supplied
+        env:
+          GSC_CREDENTIALS_JSON: ${{ secrets.GSC_CREDENTIALS_JSON }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          raw=os.environ.get('GSC_CREDENTIALS_JSON')
+          if raw:
+              p=Path(os.environ['RUNNER_TEMP'])/'gsc-credentials.json'
+              fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+              with os.fdopen(fd,'w') as f:f.write(raw)
+              with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+          PY
+      - name: Read final data, compare weeks, inspect URLs, save managed report
+        id: report
+        env:
+          SEO_ANALYTICS_URL: https://unity-analytics.vercel.app/api/seo/reports
+          SEO_INGEST_TOKEN: ${{ secrets.SEO_INGEST_TOKEN }}
+        run: python -m seo_growth.cli --ledger state/ledger.json run --redact-queries
+      - name: Optional tested static maintenance through a PR
+        env:
+          GH_TOKEN: ${{ secrets.SEO_HP_TOKEN }}
+        if: ${{ env.SEO_HP_TOKEN != '' }}
+        run: |
+          gh repo clone nyokki519/unityHP "$RUNNER_TEMP/unityHP"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          gh auth setup-git
+          python -m seo_growth.automation --repo "$RUNNER_TEMP/unityHP" --ledger state/ledger.json --publish
+      - name: Keep sanitized decision history durable (not an evictable cache)
+        if: ${{ always() && steps.report.outcome == 'success' }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          mkdir -p reports
+          cp out/*.md reports/
+          git add state/ledger.json reports/
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore(seo): persist sanitized observation and decision ledger'
+            git push origin HEAD:main
+          fi
+      - name: Upload weekly report (search queries redacted)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-weekly-${{ github.run_id }}
+          path: |
+            out/
+            state/ledger.json
+          retention-days: 90

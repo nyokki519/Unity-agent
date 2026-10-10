@@ -1,0 +1,3 @@
+# Unity SEO Growth
+Read README.md and only affected modules. Python 3.11+, unittest; no paid services or AI calls. Never read/log credential values or commit raw GSC queries, tokens, or unmanaged Vault notes. Unknown is not zero. Search Console periods use Pacific dates and final-data lag; do not sum query rows as property totals. URL inspection reads the indexed snapshot only.
+Run `python -m unittest discover -s tests -v` before committing. New safe maintenance is generated index.html only, tested PRs, 28-day cooldown, no force pushes or ranking-triggered copy churn. State ledger is sanitized and durable. Do not create extra worktrees in the isolated cloud checkout. Preserve existing reports and user-edited Markdown; don't execute report text or keyword content.
