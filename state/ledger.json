@@ -1,0 +1,16 @@
+{
+  "tasks": [],
+  "measures": [
+    [
+      "homepage-seo-2026-10",
+      "2026-10-11",
+      "{\"summary\": \"\\u521d\\u671fHTML\\u30fb\\u69cb\\u9020\\u5316\\u30c7\\u30fc\\u30bf\\u30fb\\u53c2\\u52a0\\u30ac\\u30a4\\u30c9\\u30fb\\u516c\\u5f0fSNS\\u5c0e\\u7dda\\u306e\\u6539\\u5584\", \"commit\": \"a68b3d3\", \"page\": \"https://nyokki519.github.io/unityHP/\"}"
+    ]
+  ],
+  "observations": [
+    [
+      "2026-10-07-6b2a054c4dd6",
+      "{\"id\": \"2026-10-07-6b2a054c4dd6\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": null, \"previous\": null, \"gscStatus\": \"authentication_required\"}"
+    ]
+  ]
+}
