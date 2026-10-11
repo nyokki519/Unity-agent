@@ -25,6 +25,10 @@
       "{\"id\": \"2026-10-07-a797688f391c\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"previous\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"gscStatus\": \"available\"}"
     ],
     [
+      "2026-10-07-cc5339532759",
+      "{\"id\": \"2026-10-07-cc5339532759\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"previous\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"gscStatus\": \"available\"}"
+    ],
+    [
       "2026-10-07-de7ef081ca4b",
       "{\"id\": \"2026-10-07-de7ef081ca4b\", \"period\": {\"start\": \"2026-10-01\", \"end\": \"2026-10-07\"}, \"current\": null, \"previous\": null, \"gscStatus\": \"authentication_required\"}"
     ],
