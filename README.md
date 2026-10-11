@@ -60,7 +60,7 @@ Analyticsの `supabase/migrations/013_seo_growth.sql` を適用し、Vercelと�
 ## 取得できる情報・取得できない情報
 
 - 取得可能：Search Analyticsの表示回数・クリック・CTR・平均掲載順位・検索語・ページ、sitemap状態、指定URLの最終インデックス情報。
-- 取得不可：Google全検索の順位追跡、APIにないSearch Consoleの全画面、ライブURL検査、インデックス登録リクエスト、手動対策/セキュリティ情報、Instagram Insights、現地の参加申込CVR、field Core Web Vitals。
+- 取得不可：Google全検索の順位追跡、APIにないSearch Consoleの全画面、ライブURL検査、インデックス登録リクエスト、手動対策/セキュリティ情報、Instagramの未認証Insights、LINE/つなげーとの直接申込・現地参加人数・全参加申込CVR、field Core Web Vitals。
 - HTTP200、sitemap公開、`site:`検索だけではGoogleのインデックス完了を断定しません。Search Console APIの接続後にURL Inspectionで確認します。
 
 ## 停止・ロールバック
@@ -71,3 +71,11 @@ Actions workflowを無効化するか専用secretを解除して自動化を停�
 - https://developers.google.com/webmaster-tools/v1/searchanalytics/query
 - https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect
 - https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics
+
+## Instagram・参加申込の週次レポート
+
+週次runにGrowth同期/集計を追加しています。既存 `SEO_INGEST_TOKEN` で固定Analytics APIに接続し、Instagram公式Insightsのreach/views/total_interactionsと、推定流入元別のHP訪問→申込クリック→Google側の受付確認を取得します。Meta/フォーム秘密値はAgentに置きません。Googleの検索語を個人申込と結びつけません。
+
+[Analyticsの導入手順](https://github.com/nyokki519/unity-analytics/blob/main/docs/growth-measurement.md)のSQL014、Vercelの計測有効化、Meta認証、Form確認triggerが本番の前提です。未設定・権限不足・開始前は0ではなく未取得、部分取得・10,000行の上限・90日保存期間外をレポートで明示します。受付確認は同じ初回流入コホートの30日以内のセッションで、参加人数/実出席とは区別します。集計はUTC、GSCはPacificで、率や期間比較をそのまま因果効果とは呼びません。
+
+Markdown/Obsidian出力にもGrowth集計を含みます。公開Markdownには集計のみをコピーし、UUID・receipt・accountID・token・フォーム回答・検索語を追加しません。既存GSCレポートはGrowth接続が失敗しても作成を続けます。`state/integration-status.json` に秘密を含まない接続状態を保存します。

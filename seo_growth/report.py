@@ -5,6 +5,7 @@ import hashlib,json,copy
 from .analysis import periods,compare_metrics,opportunities,growing_queries
 from .gsc import SearchConsole,ApiError,authenticated_transport
 from .audit import audit_site
+from .growth import read_growth
 LIMITATIONS=[
  'Search Analytics returns top rows and omits anonymized query text; query/page sums are not property totals.',
  'Dates use America/Los_Angeles and a three-day final-data lag. All periods are seven complete inclusive days.',
@@ -46,6 +47,7 @@ def collect(config,state,as_of=None,api_factory=None,auditor=audit_site):
         if len(report[field])>100:
             report['coverage'].setdefault(field,{})['reportRowsLimited']=100
             report[field]=report[field][:100]
+    report['growth']=read_growth(period)
     signature=hashlib.sha256(json.dumps(report,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
     report['id']=period['end']+'-'+signature[:12]
     state.observe(report)
@@ -89,6 +91,19 @@ def markdown(r):
         lines.append(f"- {text(m['applied'])}: {text(m.get('summary',m['id']))}。観察状況: {text(evaluation.get('status','unknown'))}。期間比較は因果効果の証明ではありません。")
         if evaluation.get('comparison'):lines.append('  比較: '+text(json.dumps(evaluation,ensure_ascii=False)))
     if not r.get('measures'):lines.append('記録された施策なし。`record-measure`で適用日・commit・変更内容・対象ページを保存できます。')
+    growth=r.get('growth',{})
+    lines.append('\n## InstagramとHPから申込への効果測定（UTC）')
+    lines.append('接続: '+text(growth.get('status','未取得'))+'。GSCのPacific集計とは日付境界が異なります。')
+    ig=growth.get('instagram') or {}
+    lines.append('Instagram: '+text(ig.get('status','未取得')))
+    for k,v in ig.get('metrics',{}).items():lines.append('- '+text(k)+': '+('未取得' if v is None else str(v)))
+    attribution=growth.get('attribution') or {}
+    lines.append('申込受付確認: '+text(attribution.get('confirmationStatus','未取得'))+' / '+text(attribution.get('cohortMaturity','未取得')))
+    if attribution.get('truncated'):lines.append('取得上限に達しました。以下の件数は一部のみで、期間合計・受付率ではありません。')
+    if attribution.get('retentionCoverage') in ('outside_retention','partial_retention'):lines.append('90日間の保存期間外を含み、全期間の件数と率は未取得です。残っているデータのみ表示します。')
+    for row in attribution.get('sources',[]):
+        lines.append('- '+text(row['source'])+': 観測セッション '+str(row.get('observedSessions'))+'、申込クリック '+str(row.get('registrationClicks'))+'、受付確認 '+('未取得' if row.get('confirmedSessions') is None else str(row['confirmedSessions'])))
+    lines.append('訪問セッションは人数ではありません。送信操作・外部サイトでの申込・実参加を受付完了とみなしません。同じ流入時期の30日間を観察し、未設定は未取得です。')
     lines.append('\n## データの制約')
     lines.extend('- '+text(x) for x in r['limitations'])
     return '\n'.join(lines)+'\n'

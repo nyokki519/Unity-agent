@@ -64,6 +64,11 @@ jobs:
           import requests
           report=json.loads(next(Path('out').glob('*.json')).read_text())
           status={'gscStatus':report['gscStatus'],'analyticsStatus':report['analyticsStatus'],'reportId':report['id'],'storedReportVerified':False}
+          growth=report.get('growth',{})
+          status['growthStatus']=growth.get('status','unavailable')
+          status['instagramStatus']=(growth.get('instagram') or {}).get('status','unavailable')
+          status['attributionStatus']=(growth.get('attribution') or {}).get('status','unavailable')
+          status['confirmationStatus']=(growth.get('attribution') or {}).get('confirmationStatus','unavailable')
           status['sitemapCollectionStatus']=report.get('coverage',{}).get('sitemaps',{}).get('status','available' if 'sitemaps' in report else 'unavailable')
           status['sitemaps']=[{k:item[k] for k in ('path','lastSubmitted','lastDownloaded','isPending','errors','warnings','contents') if k in item} for item in report.get('sitemaps',{}).get('sitemap',[]) if item.get('path','').startswith('https://nyokki519.github.io/')]
           token=os.environ.get('SEO_INGEST_TOKEN')
