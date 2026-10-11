@@ -54,6 +54,27 @@ jobs:
           SEO_ANALYTICS_URL: https://unity-analytics.vercel.app/api/seo/reports
           SEO_INGEST_TOKEN: ${{ secrets.SEO_INGEST_TOKEN }}
         run: python -m seo_growth.cli --ledger state/ledger.json run --redact-queries
+      - name: Verify saved report through the private API (status only)
+        env:
+          SEO_INGEST_TOKEN: ${{ secrets.SEO_INGEST_TOKEN }}
+        run: |
+          python - <<'PYCODE'
+          import json,os
+          from pathlib import Path
+          import requests
+          report=json.loads(next(Path('out').glob('*.json')).read_text())
+          status={'gscStatus':report['gscStatus'],'analyticsStatus':report['analyticsStatus'],'reportId':report['id'],'storedReportVerified':False}
+          token=os.environ.get('SEO_INGEST_TOKEN')
+          if token:
+              try:
+                  response=requests.get('https://unity-analytics.vercel.app/api/seo/reports',headers={'Authorization':'Bearer '+token},timeout=30,allow_redirects=False)
+                  status['readHttpStatus']=response.status_code
+                  if response.status_code==200:
+                      status['storedReportVerified']=any(r.get('id')==report['id'] for r in response.json().get('reports',[]))
+              except Exception:status['readStatus']='connection_unavailable'
+          Path('state/integration-status.json').write_text(json.dumps(status)+'\n')
+          print(json.dumps(status))
+          PYCODE
       - name: Optional tested static maintenance through a PR
         env:
           GH_TOKEN: ${{ secrets.SEO_HP_TOKEN }}
@@ -71,7 +92,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           mkdir -p reports
           cp out/*.md reports/
-          git add state/ledger.json state/auth-status.json reports/
+          git add state/ledger.json state/auth-status.json state/integration-status.json reports/
           if ! git diff --cached --quiet; then
             git commit -m 'chore(seo): persist sanitized observation and decision ledger'
             git push origin HEAD:main
