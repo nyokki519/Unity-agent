@@ -47,6 +47,10 @@
     [
       "2026-10-15-60902afe3c6a",
       "{\"id\": \"2026-10-15-60902afe3c6a\", \"period\": {\"start\": \"2026-10-09\", \"end\": \"2026-10-15\"}, \"current\": {\"clicks\": 0, \"impressions\": 2, \"ctr\": 0, \"position\": 4.5}, \"previous\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"gscStatus\": \"available\"}"
+    ],
+    [
+      "2026-10-22-a0e3f4560c7e",
+      "{\"id\": \"2026-10-22-a0e3f4560c7e\", \"period\": {\"start\": \"2026-10-16\", \"end\": \"2026-10-22\"}, \"current\": {\"clicks\": 0, \"impressions\": 0, \"ctr\": 0, \"position\": 0}, \"previous\": {\"clicks\": 0, \"impressions\": 2, \"ctr\": 0, \"position\": 4.5}, \"gscStatus\": \"available\"}"
     ]
   ]
 }
